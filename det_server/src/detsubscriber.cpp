@@ -1,21 +1,37 @@
 #include "ros/ros.h"
 #include "my_service/Determinant.h"
+#include "std_msgs/Float32.h"
 
-bool determ(my_service::Determinant::Request &req,
-    my_service::Determinant::Response &res)
-{
-	res.det = req.first*req.fifth*req.ninth+req.seventh*req.second*req.sixth+req.fourth*req.eighth*req.third-req.seventh*req.fifth*req.third-req.first*req.eighth*req.sixth-req.fourth*req.second*req.ninth;
-	ROS_INFO("request:a11=%d;a12=%d;a13=%d;a21=%d;a22=%d;a23=%d;a31=%d;a32=%d;a33=%d;",req.first,req.second,req.fourth,req.fifth,req.sixth,req.seventh,req.eighth,req.ninth);
-	ROS_INFO("sending back response:[%f]",res.det);
-	return true;
+void receive(const std_msgs::Float32 &input){
+
+	float determ_recieve = input.data;
+	
+	if (int(determ_recieve) % 2 == 0)
+	{
+		ROS_INFO("even");
+	}
+	else
+	{
+	 	ROS_INFO("odd");
+	}
+
+
+	return;
+
 }
 
 int main(int argc, char **argv)
 {
-	ros::init(argc,argv,"determinant_of_matrix_server");
+	ros::init(argc,argv,"determ_publisher");
+
 	ros::NodeHandle n;
-	ros::ServiceServer service=n.advertiseService("determinant_of_matrix",determ);
-	ROS_INFO("READY TO FIND DETERMINANT");
+	my_service::Determinant srv;
+	ros::Subscriber sub = n.subscribe("/det_mat", 100, receive);
+
 	ros::spin();
-	return 0;
+
+
+
+    return 0;
 }
+
